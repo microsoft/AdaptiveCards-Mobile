@@ -20,6 +20,9 @@ schedules:
 pool:
   vmImage: 'macos-latest'
 
+variables:
+- group: AdaptiveCards-KVLink
+
 steps:
   - bash: | 
      echo "Adaptive Version ${{ parameters.appVersion }}.$BUILD_NUMBER"
@@ -28,7 +31,28 @@ steps:
     displayName: 'Bash - update sample app version'
     env:
       BUILD_NUMBER: $(Build.BuildNumber)
-  - template: templates/ios-install-cert-template.yml
+
+
+  - task: InstallAppleCertificate@2
+    displayName: 'Install Certificates'
+    inputs:
+      certSecureFile: 'Certificates.p12' 
+      certPwd: '$(P12password)'
+      keychain: 'temp'
+
+  - task: InstallAppleProvisioningProfile@1
+    displayName: 'Install Provisioning Profile'
+    inputs:
+      provisioningProfileLocation: 'secureFiles'
+      provProfileSecureFile: '2f82ca7c-d043-48c8-9298-7ca6331b08c7.mobileprovision'
+
+  - template: templates/ios-build-template.yml
+    parameters:
+      sdk: iphoneos
+      signingOption: auto
+      packageApp: true
+      configuration: Release
+
   - task: AppCenterDistribute@3
     inputs:
       serverEndpoint: 'AppCenter App iOS'
