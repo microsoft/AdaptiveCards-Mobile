@@ -31,8 +31,8 @@ steps:
   - template: templates/ios-install-cert-template.yml
   - task: AppCenterDistribute@3
     inputs:
-      serverEndpoint: 'Microsoft App Center'
-      appSlug: 'Adaptive-Cards/Adaptive-Cards-iOS-Visualizer'
+      serverEndpoint: 'AppCenter App iOS'
+      appSlug: 'AdaptiveCards-Mobile/AdaptiveCards-iOS-Visualizer'
       appFile: '**/*.ipa'
       symbolsDsymFiles: '**/*.dSYM'
       symbolsIncludeParentDirectory: true
