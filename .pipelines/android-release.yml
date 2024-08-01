@@ -3,6 +3,12 @@ name: $(Year:yy).$(Month).$(DayOfMonth).$(rev:r)
 pr: none
 trigger: none
 
+resources:
+  repositories:
+  - repository: SkypeSpaces-Infra
+    type: git
+    name: SkypeSpaces-Infra
+
 pool:
   name: Azure Pipelines
   vmImage: windows-2019
@@ -111,23 +117,10 @@ stages:
            echo "Copied pom to $dest for signing"
          }
 
-    - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
-      displayName: 'ESRP CodeSign (Detached PGP)'
-      inputs:
-        ConnectedServiceName: 'AdaptiveCards ESRP CodeSigning Oct 2023'
-        FolderPath: $(build.artifactstagingdirectory)
-        Pattern: '*.asc'
-        signConfigType: inlineSignParams
-        inlineOperation: |
-         [
-           {
-             "KeyCode":"CP-464385-Pgp",
-             "OperationCode":"LinuxSign",
-             "Parameters":{},
-             "ToolName":"sign",
-             "ToolVersion":"1.0"
-           }
-         ]
+    - template: ../ESRP-V5/ESRP-CodeSigning-400.yml@SkypeSpaces-Infra
+      parameters:
+        workingDirectory: $(build.artifactstagingdirectory)
+        pattern: '*.asc'
 
     - task: Gradle@2
       displayName: 'Gradle Signed Publish to Local Directory'
